@@ -1,0 +1,54 @@
+{
+  "name": "dsh-restart-account",
+  "version": "1.0.0",
+  "description": "Adds a Restart DSH entry below sign out in the sidebar account menu: it closes the desktop app and relaunches it, without a console window.",
+  "type": "module",
+  "license": "MIT",
+  "author": "aaron999-h",
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "dsh",
+    "restart",
+    "relaunch",
+    "desktop"
+  ],
+  "icon": "assets/icon.svg",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aaron999-h/dsh-restart-account.git"
+  },
+  "homepage": "https://github.com/aaron999-h/dsh-restart-account",
+  "bugs": {
+    "url": "https://github.com/aaron999-h/dsh-restart-account/issues"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./assets/icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "locale/",
+    "docs/",
+    "assets/",
+    "README.md",
+    "README.zh.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-settings-account"
+      ]
+    }
+  }
+}
