@@ -1,0 +1,3 @@
+- insert:
+    - id: dsh-restart-account
+      name: 'dsh-restart-account'
