@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "Restart DSH",
+    "description": "Adds a restart item below sign out in the sidebar account menu.",
+    "detail": "README.md"
+  }
+}
