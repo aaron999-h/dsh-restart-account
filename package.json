@@ -1,6 +1,6 @@
 {
   "name": "dsh-restart-account",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Adds a Restart DSH entry below sign out in the sidebar account menu: it closes the desktop app and relaunches it, without a console window.",
   "type": "module",
   "license": "MIT",
