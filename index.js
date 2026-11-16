@@ -19,7 +19,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 /** Services this Host half needs. */
-export const inject = ['webServer']
+export const inject = ['webServer', 'connection']
 
 /** Route prefix owned by this plugin. */
 const PREFIX = '/restart-dsh'
@@ -296,6 +296,27 @@ export function apply(ctx) {
   }
 
   /**
+   * Applies Connection's own Host/Origin fence plus the browser-authentication
+   * check that every built-in web route passes. A plain route registered on the
+   * web server is otherwise reachable from any process that can open a socket.
+   * @param req - incoming request.
+   * @returns the rejection to send, or undefined when the request may proceed.
+   */
+  const fence = (req) => {
+    try {
+      const refused = ctx.connection?.requestRejection?.(req)
+      if (refused !== undefined) {
+        journal(logPath, `connection fence rejected ${req.method} ${req.url} (${refused})`)
+        return [refused, refused === 401 ? 'unauthorized' : 'forbidden']
+      }
+    } catch (error) {
+      journal(logPath, `connection fence failed (${error?.message ?? error})`)
+      return [500, 'fence-failed']
+    }
+    return undefined
+  }
+
+  /**
    * Shared guard for the two acting routes.
    * @param req - incoming request.
    * @returns the rejection to send, or undefined when the request may proceed.
@@ -310,7 +331,12 @@ export function apply(ctx) {
   ctx.effect(() => ctx.webServer.register({
     kind: 'exact',
     path: `${PREFIX}/status`,
-    handler: (_req, res) => {
+    handler: (req, res) => {
+      const blocked = fence(req)
+      if (blocked !== undefined) {
+        json(res, blocked[0], { ok: false, error: blocked[1] })
+        return
+      }
       json(res, 200, {
         desktop,
         supported: desktop,
@@ -328,6 +354,11 @@ export function apply(ctx) {
     kind: 'exact',
     path: `${PREFIX}/restart`,
     handler: (req, res) => {
+      const blocked = fence(req)
+      if (blocked !== undefined) {
+        json(res, blocked[0], { ok: false, error: blocked[1] })
+        return
+      }
       const denied = rejection(req)
       if (denied !== undefined) {
         json(res, denied[0], { ok: false, error: denied[1] })
@@ -370,6 +401,11 @@ export function apply(ctx) {
     kind: 'exact',
     path: `${PREFIX}/probe`,
     handler: (req, res) => {
+      const blocked = fence(req)
+      if (blocked !== undefined) {
+        json(res, blocked[0], { ok: false, error: blocked[1] })
+        return
+      }
       const denied = rejection(req)
       if (denied !== undefined) {
         json(res, denied[0], { ok: false, error: denied[1] })
