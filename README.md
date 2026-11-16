@@ -59,6 +59,8 @@ None. No settings, no network access, no telemetry. The only host routes it regi
 
 `POST /restart-dsh/restart?dry=1` returns the generated script instead of running it.
 
+All three routes first pass DSH's own admission check, `ctx.connection.requestRejection(req)` — the same Host/Origin fence and browser-credential / live-Peer check every built-in web route goes through — and answer `401` or `403` when it rejects the request. Beyond that, the two acting routes additionally require the `x-dsh-restart: 1` intent header and a same-origin request.
+
 ## Uninstall
 
 ```bash
