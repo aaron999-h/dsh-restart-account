@@ -59,6 +59,8 @@ bundle 由 `cordis.patch.yml` 启用，插入的条目 id 为 `dsh-restart-accou
 
 `POST /restart-dsh/restart?dry=1` 只返回生成的脚本正文。
 
+三条路由在处理请求前都会先过 DSH 自己的准入检查 `ctx.connection.requestRejection(req)`——与所有内置 Web 路由相同的 Host/Origin 围栏与浏览器凭据 / 实时 Peer 校验——被拒时直接回 `401` / `403`。在此之上，两个会执行动作的路由还要求 `x-dsh-restart: 1` 意图头与同源请求。
+
 ## 卸载
 
 ```bash
